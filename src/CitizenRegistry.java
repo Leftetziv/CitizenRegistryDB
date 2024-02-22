@@ -1,15 +1,15 @@
 import java.util.HashSet;
 import java.util.Set;
 
-public class MitrooPoliton {
+public class CitizenRegistry {
 
-    private Set<Politis> MitrooPoliton = new HashSet<>();
+    private Set<Citizen> MitrooPoliton = new HashSet<>();
 
-    public MitrooPoliton() {
+    public CitizenRegistry() {
         DatabaseConnector.setMitrooPolitonState();
     }
 
-    public boolean addPolitis(Politis politis) {
+    public boolean addPolitis(Citizen citizen) {
         return false;
     }
 
@@ -17,11 +17,11 @@ public class MitrooPoliton {
         return false;
     }
 
-    public boolean updateRecord(Politis politis) {
+    public boolean updateRecord(Citizen citizen) {
         return false;
     }
 
-    public Set<Politis> searchRecords(Politis politis) {
+    public Set<Citizen> searchRecords(Citizen citizen) {
         return null;
     }
 

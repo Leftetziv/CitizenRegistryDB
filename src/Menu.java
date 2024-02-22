@@ -6,9 +6,9 @@ import java.util.regex.Pattern;
 public class Menu {
     public static void main(String[] args) {
 
-        MitrooPoliton mitrooPoliton = new MitrooPoliton();
+        CitizenRegistry citizenRegistry = new CitizenRegistry();
 
-        System.out.println("Menu for Mitroo Politon");
+        System.out.println("Menu for Citizen Registry");
         int choice = 0;
         Scanner input = new Scanner(System.in);
 
@@ -27,11 +27,11 @@ public class Menu {
             }
 
             switch (choice) {
-                case 1: addPolitis(input); break;
-                case 2: deleteRecord(input); break;
-                case 3: updateRecord(input); break;
-                case 4: searchRecords(input); break;
-                case 5: printRecords(input); break;
+                case 1: addCitizen(input); break;
+                case 2: deleteCitizen(input); break;
+                case 3: updateCitizen(input); break;
+                case 4: searchCitizens(input); break;
+                case 5: printCitizens(input); break;
             }
         } while (choice >= 1 && choice <=5);
 
@@ -39,23 +39,23 @@ public class Menu {
         System.out.println("Exiting program");
     }
 
-    private static String readArithmosTautotitas(Scanner input, String msg) throws Exception {
-        String arithmosTautotitas = getStringInputRequired(input, msg);
-        if (arithmosTautotitas.length() != 1 ) {
-            throw new Exception("ERROR. Arithmos Tautotitas must have exactly 8 digits");
+    private static String readId(Scanner input, String msg) throws Exception {
+        String id = getStringInputRequired(input, msg);
+        if (id.length() != 1 ) {
+            throw new Exception("ERROR. ID must have exactly 8 digits");
         }
 
-        return arithmosTautotitas;
+        return id;
     }
 
-    private static String readFylo(Scanner input, String msg) throws Exception {
-        String fylo = getStringInputRequired(input, msg);
+    private static String readGender(Scanner input, String msg) throws Exception {
+        String gender = getStringInputRequired(input, msg);
 
-        if (!fylo.equals("m") && !fylo.equals("f")) {
-            throw new Exception("ERROR. Fylo can only be entered as \'m\' or \'f\'");
+        if (!gender.equals("m") && !gender.equals("f")) {
+            throw new Exception("ERROR. Gender can only be entered as \'m\' or \'f\'");
         }
 
-        return fylo;
+        return gender;
     }
 
     private static String readDob(Scanner input, String msg) throws Exception {
@@ -88,22 +88,22 @@ public class Menu {
         return afm;
     }
 
-    private static void addPolitis(Scanner input) {
+    private static void addCitizen(Scanner input) {
         try {
-            String arithmosTautotitas = readArithmosTautotitas(input, "Please enter Arithmo Tautotitas");
-            String onoma = getStringInputRequired(input, "Please enter Onoma");
-            String eponymo = getStringInputRequired(input, "Please enter Eponymo");
-            String fylo = readFylo(input, "Please enter Fylo (m/f)");
-            String dob = readDob(input, "Please enter Date of Birth");
+            String id = readId(input, "Please enter ID");
+            String firstName = getStringInputRequired(input, "Please enter first name");
+            String lastName = getStringInputRequired(input, "Please enter last name");
+            String gender = readGender(input, "Please enter gender (m/f)");
+            String dob = readDob(input, "Please enter date of birth");
             String afm = readAfm(input, "Please enter AFM");
-            String address = getStringInput(input, "Please enter Address");
+            String address = getStringInput(input, "Please enter address");
             //todo make own class
 
-            Politis p = new Politis(
-                    arithmosTautotitas,
-                    onoma,
-                    eponymo,
-                    fylo,
+            Citizen c = new Citizen(
+                    id,
+                    firstName,
+                    lastName,
+                    gender,
                     dob,
                     afm,
                     address
@@ -111,65 +111,65 @@ public class Menu {
 
             System.out.println(dob);
 
-            //mitrooPoliton.addPolitis(politis)
+            //citizenRegistry.addCitizen(c)
         } catch (Exception e) {
             System.out.println(e.getMessage());
-            System.out.println("Record was not saved.");
+            System.out.println("Citizen record was not saved.");
         }
     }
 
-    private static void deleteRecord(Scanner input) {
+    private static void deleteCitizen(Scanner input) {
         try {
-            String arithmosTautotitas = readArithmosTautotitas(input, "Please enter Arithmo Tautotitas for deletion");
+            String id = readId(input, "Please enter ID for deletion");
 
-            System.out.println(arithmosTautotitas);
+            System.out.println(id);
 
             //mitrooPoliton.addRecord(politis)
         } catch (Exception e) {
             System.out.println(e.getMessage());
-            System.out.println("Record deletion failed.");
+            System.out.println("Citizen record deletion failed.");
         }
     }
 
-    private static void updateRecord(Scanner input) {
+    private static void updateCitizen(Scanner input) {
         try {
-            String arithmosTautotitas = readArithmosTautotitas(input, "Please enter Arithmo Tautotitas to update record");
+            String id = readId(input, "Please enter ID to update record");
 
             //anazitisi sto an uparxei o arithmosTautotitas. an den yparxei prepei na skaei exception
 
-            String onoma = getStringInputRequired(input, "Please enter new Onoma (old value: ");
-            String eponymo = getStringInputRequired(input, "Please enter new Eponymo (old value: ");
-            String fylo = readFylo(input, "Please enter new Fylo (m/f) (old value: ");
-            String dob = readDob(input, "Please enter new Date of Birth (old value: ");
+            String firstName = getStringInputRequired(input, "Please enter new first name (old value: ");
+            String lastName = getStringInputRequired(input, "Please enter new last name (old value: ");
+            String gender = readGender(input, "Please enter new gender (m/f) (old value: ");
+            String dob = readDob(input, "Please enter new date of birth (old value: ");
             String afm = readAfm(input, "Please enter new AFM (old value: ");
-            String address = getStringInput(input, "Please enter new Address (old value: ");
+            String address = getStringInput(input, "Please enter new address (old value: ");
             //todo make own class
 
-//            Politis p = new Politis(
-//                    arithmosTautotitas,
-//                    onoma,
-//                    eponymo,
-//                    fylo,
-//                    dob,
-//                    afm,
-//                    address
-//            );
+            Citizen c = new Citizen(
+                    id,
+                    firstName,
+                    lastName,
+                    gender,
+                    dob,
+                    afm,
+                    address
+            );
 
 
             //mitrooPoliton.addRecord(politis)
         } catch (Exception e) {
             System.out.println(e.getMessage());
-            System.out.println("Record was not updated.");
+            System.out.println("Citizen record was not updated.");
         }
     }
 
-    private static void searchRecords(Scanner input) {
+    private static void searchCitizens(Scanner input) {
         //read data from user
 
         //mitrooPoliton.addRecord
     }
 
-    private static void printRecords(Scanner input) {
+    private static void printCitizens(Scanner input) {
         //read data from user
 
         //mitrooPoliton.addRecord

@@ -11,7 +11,7 @@ public class DatabaseConnector {
     private static final String url = "jdbc:mysql://localhost:3306/";
     private static final String user = "root";
     private static final String password = "";
-    private static final String dbName = "mitroo_politon";
+    private static final String dbName = "citizen_registry";
 
     private static String getFileContent(String path) {
         try {
@@ -118,7 +118,7 @@ public class DatabaseConnector {
                 con.setAutoCommit(false);
                 Statement st = con.createStatement();
 
-                String stmt = getFileContent("sql/create_table_politis.sql");
+                String stmt = getFileContent("sql/create_table_citizen.sql");
                 st.execute(stmt);
 
                 con.commit();
