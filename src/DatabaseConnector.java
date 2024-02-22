@@ -54,7 +54,7 @@ public class DatabaseConnector {
         }
     }
 
-    public static void setMitrooPolitonState() {
+    public static void setCitizenRegistryState() {
         boolean exists = existsDatabase();
         System.out.println("does db exists?: " + exists);
         if (!exists) createDatabaseTables();

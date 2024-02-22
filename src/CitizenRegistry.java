@@ -1,31 +1,30 @@
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 
 public class CitizenRegistry {
 
-    private Set<Citizen> MitrooPoliton = new HashSet<>();
-
     public CitizenRegistry() {
-        DatabaseConnector.setMitrooPolitonState();
+        DatabaseConnector.setCitizenRegistryState();
     }
 
-    public boolean addPolitis(Citizen citizen) {
+    public boolean addCitizen(Citizen citizen) {
         return false;
     }
 
-    public boolean removeRecord(String arithmosTautotitas) {
+    public boolean removeCitizen(String id) {
         return false;
     }
 
-    public boolean updateRecord(Citizen citizen) {
+    public boolean updateCitizen(Citizen citizen) {
         return false;
     }
 
-    public Set<Citizen> searchRecords(Citizen citizen) {
+    public Optional<Set<Citizen>> searchCitizens(Citizen citizen) {
         return null;
     }
 
-    public void printRecords() {
+    public void printCitizens() {
 
     }
 }
