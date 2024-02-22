@@ -24,7 +24,7 @@ public class DatabaseConnector {
         return null;
     }
 
-    private static Connection getConnection(String dbName) {
+    public static Connection getConnection(String dbName) {
         String URL = url;
         if (dbName != null) {
             URL += dbName;
@@ -43,7 +43,7 @@ public class DatabaseConnector {
         return con;
     }
 
-    private static void closeConnection(Connection con) {
+    public static void closeConnection(Connection con) {
         try {
             if (con != null && !con.isClosed()) {
                 con.close();
@@ -54,7 +54,13 @@ public class DatabaseConnector {
         }
     }
 
-    public static boolean existsDatabase() {
+    public static void setMitrooPolitonState() {
+        boolean exists = existsDatabase();
+        System.out.println("does db exists?: " + exists);
+        if (!exists) createDatabaseTables();
+    }
+
+    private static boolean existsDatabase() {
         boolean found = false;
         Connection con = getConnection(null);
         if (con != null) {
@@ -78,7 +84,7 @@ public class DatabaseConnector {
         return found;
     }
 
-    public static boolean createDatabaseTables() {
+    private static boolean createDatabaseTables() {
         boolean created = false;
         Connection con = getConnection(null);
 
@@ -130,18 +136,12 @@ public class DatabaseConnector {
     }
 
 
-    private static void rollBack(Connection con) {
+    public static void rollBack(Connection con) {
         try {
             con.rollback();
         } catch (Exception e) {
             System.out.println("something went wrong while trying to rollback the connection");
         }
     }
-
-    public static boolean insertPolitis(Politis politis) {
-        return false;
-    }
-
-
 
 }

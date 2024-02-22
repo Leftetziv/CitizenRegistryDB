@@ -1,4 +1,4 @@
-CREATE TABLE Persons (
+CREATE TABLE Politis (
     arithmos_tautotitas varchar(8) PRIMARY KEY,
     onoma varchar(255) NOT NULL,
     eponympo varchar(255) NOT NULL,

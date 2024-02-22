@@ -5,7 +5,11 @@ public class MitrooPoliton {
 
     private Set<Politis> MitrooPoliton = new HashSet<>();
 
-    public boolean addRecord(Politis politis) {
+    public MitrooPoliton() {
+        DatabaseConnector.setMitrooPolitonState();
+    }
+
+    public boolean addPolitis(Politis politis) {
         return false;
     }
 

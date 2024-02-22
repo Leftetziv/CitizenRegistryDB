@@ -8,12 +8,6 @@ public class Menu {
 
         MitrooPoliton mitrooPoliton = new MitrooPoliton();
 
-        // todo new method
-        boolean exists = DatabaseConnector.existsDatabase();
-        System.out.println("does db exists?: " + exists);
-        if (!exists) DatabaseConnector.createDatabaseTables();
-        //
-
         System.out.println("Menu for Mitroo Politon");
         int choice = 0;
         Scanner input = new Scanner(System.in);
@@ -33,7 +27,7 @@ public class Menu {
             }
 
             switch (choice) {
-                case 1: addRecord(input); break;
+                case 1: addPolitis(input); break;
                 case 2: deleteRecord(input); break;
                 case 3: updateRecord(input); break;
                 case 4: searchRecords(input); break;
@@ -94,7 +88,7 @@ public class Menu {
         return afm;
     }
 
-    private static void addRecord(Scanner input) {
+    private static void addPolitis(Scanner input) {
         try {
             String arithmosTautotitas = readArithmosTautotitas(input, "Please enter Arithmo Tautotitas");
             String onoma = getStringInputRequired(input, "Please enter Onoma");
@@ -117,7 +111,7 @@ public class Menu {
 
             System.out.println(dob);
 
-            //mitrooPoliton.addRecord(politis)
+            //mitrooPoliton.addPolitis(politis)
         } catch (Exception e) {
             System.out.println(e.getMessage());
             System.out.println("Record was not saved.");
