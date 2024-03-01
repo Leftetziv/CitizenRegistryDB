@@ -1,14 +1,19 @@
+import exceptions.InvalidCustomFieldsException;
+
 import java.util.InputMismatchException;
 import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Menu {
+
+    private static CitizenRegistry citizenRegistry = null;
+
     public static void main(String[] args) {
 
-        CitizenRegistry citizenRegistry = new CitizenRegistry();
+        citizenRegistry = new CitizenRegistry();
 
-        System.out.println("Menu for Citizen Registry");
+        System.out.println("\nMenu for Citizen Registry");
         int choice = 0;
         Scanner input = new Scanner(System.in);
 
@@ -39,26 +44,26 @@ public class Menu {
         System.out.println("Exiting program");
     }
 
-    private static String readId(Scanner input, String msg) throws Exception {
+    private static String readId(Scanner input, String msg) throws InvalidCustomFieldsException {
         String id = getStringInputRequired(input, msg);
         if (id.length() != 1 ) {
-            throw new Exception("ERROR. ID must have exactly 8 digits");
+            throw new InvalidCustomFieldsException("ERROR. ID must have exactly 8 digits");
         }
 
         return id;
     }
 
-    private static String readGender(Scanner input, String msg) throws Exception {
+    private static String readGender(Scanner input, String msg) throws InvalidCustomFieldsException {
         String gender = getStringInputRequired(input, msg);
 
         if (!gender.equals("m") && !gender.equals("f")) {
-            throw new Exception("ERROR. Gender can only be entered as \'m\' or \'f\'");
+            throw new InvalidCustomFieldsException("ERROR. Gender can only be entered as \'m\' or \'f\'");
         }
 
         return gender;
     }
 
-    private static String readDob(Scanner input, String msg) throws Exception {
+    private static String readDob(Scanner input, String msg) throws InvalidCustomFieldsException {
         String dob = getStringInputRequired(input, msg);
 
         // Define the regex pattern for the date format
@@ -72,17 +77,17 @@ public class Menu {
 
         // Check if the input matches the regex pattern
         if (!matcher.matches()) {
-            throw new Exception("ERROR. Invalid date format. Please enter in the format DD-MM-YYYY.");
+            throw new InvalidCustomFieldsException("ERROR. Invalid date format. Please enter in the format DD-MM-YYYY.");
         }
 
         return dob;
     }
 
-    private static String readAfm(Scanner input, String msg) throws Exception {
+    private static String readAfm(Scanner input, String msg) throws InvalidCustomFieldsException {
         String afm = getStringInput(input, msg);
 
-        if (afm.length() != 9 && afm.length() != 0) {
-            throw new Exception("ERROR. AFM must have exactly 9 digits");
+        if (afm.length() != 1 && afm.length() != 0) {
+            throw new InvalidCustomFieldsException("ERROR. AFM must have exactly 9 digits");
         }
 
         return afm;
@@ -91,41 +96,48 @@ public class Menu {
     private static void addCitizen(Scanner input) {
         try {
             String id = readId(input, "Please enter ID");
-            String firstName = getStringInputRequired(input, "Please enter first name");
-            String lastName = getStringInputRequired(input, "Please enter last name");
-            String gender = readGender(input, "Please enter gender (m/f)");
-            String dob = readDob(input, "Please enter date of birth");
-            String afm = readAfm(input, "Please enter AFM");
-            String address = getStringInput(input, "Please enter address");
+
+            if (citizenRegistry.citizenExists(id)) {
+                System.out.println("A citizen with the same ID already exists.");
+                return;
+            }
+
+            Citizen citizen = new Citizen();
+
+            citizen.setId(id);
+            citizen.setFirstName(getStringInputRequired(input, "Please enter first name"));
+            citizen.setLastName(getStringInputRequired(input, "Please enter last name"));
+            citizen.setGender(readGender(input, "Please enter gender (m/f)"));
+            citizen.setDob(readDob(input, "Please enter date of birth (DD-MM-YYYY)"));
+            citizen.setAfm(readAfm(input, "Please enter AFM"));
+            citizen.setAddress(getStringInput(input, "Please enter address"));
             //todo make own class
 
-            Citizen c = new Citizen(
-                    id,
-                    firstName,
-                    lastName,
-                    gender,
-                    dob,
-                    afm,
-                    address
-            );
-
-            System.out.println(dob);
-
-            //citizenRegistry.addCitizen(c)
-        } catch (Exception e) {
+            boolean created = citizenRegistry.addCitizen(citizen);
+            if (created) {
+                System.out.println("Citizen record saved.");
+            }
+        } catch (InvalidCustomFieldsException e) {
             System.out.println(e.getMessage());
             System.out.println("Citizen record was not saved.");
         }
+
     }
 
     private static void deleteCitizen(Scanner input) {
         try {
             String id = readId(input, "Please enter ID for deletion");
 
-            System.out.println(id);
+            if (!citizenRegistry.citizenExists(id)) {
+                System.out.println("Citizen with given ID do no exists.");
+                return;
+            }
 
-            //mitrooPoliton.addRecord(politis)
-        } catch (Exception e) {
+            boolean deleted = citizenRegistry.removeCitizen(id);
+            if (deleted) {
+                System.out.println("Citizen record was deleted.");
+            }
+        } catch (InvalidCustomFieldsException e) {
             System.out.println(e.getMessage());
             System.out.println("Citizen record deletion failed.");
         }
@@ -135,29 +147,27 @@ public class Menu {
         try {
             String id = readId(input, "Please enter ID to update record");
 
-            //anazitisi sto an uparxei o arithmosTautotitas. an den yparxei prepei na skaei exception
+            if (!citizenRegistry.citizenExists(id)) {
+                System.out.println("Citizen with given ID do no exists.");
+                return;
+            }
 
-            String firstName = getStringInputRequired(input, "Please enter new first name (old value: ");
-            String lastName = getStringInputRequired(input, "Please enter new last name (old value: ");
-            String gender = readGender(input, "Please enter new gender (m/f) (old value: ");
-            String dob = readDob(input, "Please enter new date of birth (old value: ");
-            String afm = readAfm(input, "Please enter new AFM (old value: ");
-            String address = getStringInput(input, "Please enter new address (old value: ");
-            //todo make own class
+            Citizen citizen = new Citizen();
 
-            Citizen c = new Citizen(
-                    id,
-                    firstName,
-                    lastName,
-                    gender,
-                    dob,
-                    afm,
-                    address
-            );
+            citizen.setId(id);
+            citizen.setFirstName(getStringInputRequired(input, "Please enter first name (old value: "));
+            citizen.setLastName(getStringInputRequired(input, "Please enter last name (old value: "));
+            citizen.setGender(readGender(input, "Please enter gender (m/f) (old value: "));
+            citizen.setDob(readDob(input, "Please enter date of birth (DD-MM-YYYY) (old value: "));
+            citizen.setAfm(readAfm(input, "Please enter AFM (old value: "));
+            citizen.setAddress(getStringInput(input, "Please enter address (old value: "));
 
+            boolean updated = citizenRegistry.updateCitizen(citizen);
+            if (updated) {
+                System.out.println("Citizen record updated.");
+            }
 
-            //mitrooPoliton.addRecord(politis)
-        } catch (Exception e) {
+        } catch (InvalidCustomFieldsException e) {
             System.out.println(e.getMessage());
             System.out.println("Citizen record was not updated.");
         }
@@ -191,13 +201,13 @@ public class Menu {
 //        return value;
 //    }
 
-    private static String getStringInputRequired(Scanner input, String msg) throws Exception {
+    private static String getStringInputRequired(Scanner input, String msg) throws InvalidCustomFieldsException {
         System.out.println(msg);
 
         String value = input.nextLine();
 
         if (value.isEmpty()) {
-            throw new Exception("ERROR. Field is mandatory.");
+            throw new InvalidCustomFieldsException("ERROR. Field is mandatory.");
         }
 
         return value;

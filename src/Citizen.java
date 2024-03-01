@@ -10,14 +10,7 @@ public class Citizen {
     private String afm;
     private String address;
 
-    public Citizen(String id, String firstName, String lastName, String gender, String dob, String afm, String address) {
-        this.id = id;
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.gender = gender;
-        this.dob = dob;
-        this.afm = afm;
-        this.address = address;
+    public Citizen() {
     }
 
     public String getId() {

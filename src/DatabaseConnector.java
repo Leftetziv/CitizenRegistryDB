@@ -1,10 +1,7 @@
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.Statement;
+import java.sql.*;
 
 public class DatabaseConnector {
 
@@ -35,7 +32,7 @@ public class DatabaseConnector {
             Class.forName("com.mysql.cj.jdbc.Driver");
             con = DriverManager.getConnection(URL, user, password);
         } catch (Exception e) {
-            System.out.println("Could not establish connection with DB HHHHH");
+            System.out.println("Could not establish connection with DB");
             System.out.println(e.getMessage());
             System.out.println(e);
         }
@@ -56,7 +53,7 @@ public class DatabaseConnector {
 
     public static void setCitizenRegistryState() {
         boolean exists = existsDatabase();
-        System.out.println("does db exists?: " + exists);
+        System.out.println("Does db exists? " + exists);
         if (!exists) createDatabaseTables();
     }
 
@@ -94,6 +91,7 @@ public class DatabaseConnector {
                 Statement st = con.createStatement();
                 st.execute(stmt);
                 created = true;
+                System.out.println("Created DB");
             } catch (Exception e) {
                 System.out.println("Could not create the database");
                 System.out.println(e.getMessage());
@@ -123,6 +121,7 @@ public class DatabaseConnector {
 
                 con.commit();
                 created = true;
+                System.out.println("Created tables");
             } catch (Exception e) {
                 System.out.println("Could not create the tables");
                 System.out.println(e.getMessage());
@@ -142,6 +141,129 @@ public class DatabaseConnector {
         } catch (Exception e) {
             System.out.println("something went wrong while trying to rollback the connection");
         }
+    }
+
+    public static boolean checkIfCitizenExists(String id){
+        boolean exists = false;
+        Connection con = getConnection(dbName);
+
+        if (con != null) {
+            try {
+                String stmt = getFileContent("sql/check_if_citizen_exists.sql");
+                PreparedStatement st = con.prepareStatement(stmt);
+                st.setString(1,id);
+                ResultSet rs = st.executeQuery();
+
+                if (rs.next()) {
+                    exists = true;
+                }
+            } catch (Exception e) {
+                System.out.println("Could not add new citizen to registry");
+                System.out.println(e.getMessage());
+            } finally {
+                closeConnection(con);
+            }
+        }
+
+        return exists;
+    }
+
+    public static boolean createCitizen(Citizen citizen) {
+        boolean created = false;
+        Connection con = getConnection(dbName);
+
+        if (con != null) {
+            try {
+                con.setAutoCommit(false);
+                String stmt = getFileContent("sql/insert_citizen.sql");
+                PreparedStatement st = con.prepareStatement(stmt);
+
+                st.setString(1,citizen.getId());
+                st.setString(2,citizen.getFirstName());
+                st.setString(3,citizen.getLastName());
+                st.setString(4,citizen.getGender());
+                st.setString(5,citizen.getDob());
+                st.setString(6,citizen.getAfm());
+                st.setString(7,citizen.getAddress());
+
+                st.execute();
+                con.commit();
+
+                created = true;
+            } catch (Exception e) {
+                System.out.println("Could not add new citizen to registry");
+                System.out.println(e.getMessage());
+                rollBack(con);
+            } finally {
+                closeConnection(con);
+            }
+        }
+
+        return created;
+    }
+
+    public static boolean deleteCitizen(String id) {
+        boolean deleted = false;
+        Connection con = getConnection(dbName);
+
+        if (con != null) {
+            try {
+                con.setAutoCommit(false);
+                String stmt = getFileContent("sql/delete_citizen.sql");
+                PreparedStatement st = con.prepareStatement(stmt);
+
+                st.setString(1, id);
+
+                st.execute();
+                con.commit();
+
+                deleted = true;
+            } catch (Exception e) {
+                System.out.println("Could not add new citizen to registry");
+                System.out.println(e.getMessage());
+                rollBack(con);
+            } finally {
+                closeConnection(con);
+            }
+        }
+
+        return deleted;
+    }
+
+    public static boolean updateCitizen(Citizen citizen) {
+        boolean updated = false;
+        Connection con = getConnection(dbName);
+
+        if (con != null) {
+            try {
+                con.setAutoCommit(false);
+                String stmt = getFileContent("sql/update_citizen.sql");
+                PreparedStatement st = con.prepareStatement(stmt);
+
+
+                st.setString(1,citizen.getFirstName());
+                st.setString(2,citizen.getLastName());
+                st.setString(3,citizen.getGender());
+                st.setString(4,citizen.getDob());
+                st.setString(5,citizen.getAfm());
+                st.setString(6,citizen.getAddress());
+
+                st.setString(7,citizen.getId());
+
+                st.execute();
+                con.commit();
+
+                updated = true;
+            } catch (Exception e) {
+                System.out.println("Could not update citizen to registry");
+                System.out.println(e.getMessage());
+                rollBack(con);
+            } finally {
+                closeConnection(con);
+            }
+        }
+
+        return updated;
     }
 
 }
