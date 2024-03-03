@@ -36,7 +36,7 @@ public class Menu {
                 case 2: deleteCitizen(input); break;
                 case 3: updateCitizen(input); break;
                 case 4: searchCitizens(input); break;
-                case 5: printCitizens(input); break;
+                case 5: printCitizens(); break;
             }
         } while (choice >= 1 && choice <=5);
 
@@ -46,7 +46,7 @@ public class Menu {
 
     private static String readId(Scanner input, String msg) throws InvalidCustomFieldsException {
         String id = getStringInputRequired(input, msg);
-        if (id.length() != 1 ) {
+        if (id.length() != 2 ) {
             throw new InvalidCustomFieldsException("ERROR. ID must have exactly 8 digits");
         }
 
@@ -174,15 +174,65 @@ public class Menu {
     }
 
     private static void searchCitizens(Scanner input) {
-        //read data from user
+        try {
+            Citizen citizen = new Citizen();
 
-        //mitrooPoliton.addRecord
+            String includeId = getStringInput(input, "Include ID in search? (y/N)");
+            if (includeId.equals("y") || includeId.equals("Y")) {
+                citizen.setId(readId(input, "Please enter ID"));
+            } else {
+                citizen.setId("%");
+            }
+
+            String includeFirstName = getStringInput(input, "Include first name in search? (y/N)");
+            if (includeFirstName.equals("y") || includeFirstName.equals("Y")) {
+                citizen.setFirstName(getStringInputRequired(input, "Please enter first name"));
+            } else {
+                citizen.setFirstName("%");
+            }
+
+            String includeLastName = getStringInput(input, "Include last name in search? (y/N)");
+            if (includeLastName.equals("y") || includeLastName.equals("Y")) {
+                citizen.setLastName(getStringInputRequired(input, "Please enter last name"));
+            } else {
+                citizen.setLastName("%");
+            }
+
+            String includeGender = getStringInput(input, "Include gender in search? (y/N)");
+            if (includeGender.equals("y") || includeGender.equals("Y")) {
+                citizen.setGender(readGender(input, "Please enter gender (m/f)"));
+            } else {
+                citizen.setGender("%");
+            }
+
+            String includeDob = getStringInput(input, "Include DOB in search? (y/N)");
+            if (includeDob.equals("y") || includeDob.equals("Y")) {
+                citizen.setDob(readDob(input, "Please enter date of birth (DD-MM-YYYY)"));
+            } else {
+                citizen.setDob("%");
+            }
+
+            String includeAfm = getStringInput(input, "Include AFM in search? (y/N)");
+            if (includeAfm.equals("y") || includeAfm.equals("Y")) {
+                citizen.setAfm(readAfm(input, "Please enter AFM"));
+            } else {
+                citizen.setAfm("%");
+            }
+            String includeAddress = getStringInput(input, "Include address in search? (y/N)");
+            if (includeAddress.equals("y") || includeAddress.equals("Y")) {
+                citizen.setAddress(getStringInput(input, "Please enter address"));
+            } else {
+                citizen.setAddress("%");
+            }
+
+            citizenRegistry.searchAndPrintCitizens(citizen);
+        } catch (InvalidCustomFieldsException e) {
+            System.out.println(e.getMessage());
+        }
     }
 
-    private static void printCitizens(Scanner input) {
-        //read data from user
-
-        //mitrooPoliton.addRecord
+    private static void printCitizens() {
+        citizenRegistry.printCitizens();
     }
 
 //    private static int getIntInput(Scanner input, String msg) {

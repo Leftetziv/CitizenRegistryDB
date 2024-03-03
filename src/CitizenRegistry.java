@@ -27,12 +27,30 @@ public class CitizenRegistry {
         return DatabaseConnector.updateCitizen(citizen);
     }
 
-    public Optional<Set<Citizen>> searchCitizens(Citizen citizen) {
-        return null;
+    public void searchAndPrintCitizens(Citizen citizen) {
+       Set<Citizen> citizens = DatabaseConnector.searchCitizen(citizen);
+
+       if (citizens.isEmpty()) {
+           System.out.println("No citizens were found given the criteria");
+           return;
+       }
+
+       for (Citizen c: citizens) {
+           System.out.println(c);
+       }
     }
 
-
     public void printCitizens() {
+        Set<Citizen> citizens = DatabaseConnector.getAllCitizens();
+
+        if (citizens.isEmpty()) {
+            System.out.println("No citizens found");
+            return;
+        }
+
+        for (Citizen c: citizens) {
+            System.out.println(c);
+        }
 
     }
 }

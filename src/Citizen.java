@@ -84,14 +84,13 @@ public class Citizen {
 
     @Override
     public String toString() {
-        return "Citizen{" +
-                "id='" + id + '\'' +
-                ", firstName='" + firstName + '\'' +
-                ", lastName='" + lastName + '\'' +
-                ", gender='" + gender + '\'' +
-                ", dob='" + dob + '\'' +
-                ", afm='" + afm + '\'' +
-                ", address='" + address + '\'' +
-                '}';
+
+        return "ID: " + id +
+                ", First Name: " + firstName +
+                ", Last Name: " + lastName +
+                ", Gender: " + gender +
+                ", DOB: " + dob +
+                (afm.equals("")? "" : ", AFM: " + afm) +
+                (address.equals("")? "" : ", Address: " + address);
     }
 }

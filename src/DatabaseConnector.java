@@ -2,6 +2,9 @@ import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.sql.*;
+import java.util.HashSet;
+import java.util.Optional;
+import java.util.Set;
 
 public class DatabaseConnector {
 
@@ -240,14 +243,12 @@ public class DatabaseConnector {
                 String stmt = getFileContent("sql/update_citizen.sql");
                 PreparedStatement st = con.prepareStatement(stmt);
 
-
                 st.setString(1,citizen.getFirstName());
                 st.setString(2,citizen.getLastName());
                 st.setString(3,citizen.getGender());
                 st.setString(4,citizen.getDob());
                 st.setString(5,citizen.getAfm());
                 st.setString(6,citizen.getAddress());
-
                 st.setString(7,citizen.getId());
 
                 st.execute();
@@ -266,4 +267,79 @@ public class DatabaseConnector {
         return updated;
     }
 
+    public static Set<Citizen> searchCitizen(Citizen citizen) {
+        Set<Citizen> citizens = new HashSet<>();
+        Connection con = getConnection(dbName);
+
+        if (con != null) {
+            try {
+                String stmt = getFileContent("sql/search_citizen.sql");
+                PreparedStatement st = con.prepareStatement(stmt);
+
+                st.setString(1, citizen.getId());
+                st.setString(2, citizen.getFirstName());
+                st.setString(3, citizen.getLastName());
+                st.setString(4, citizen.getGender());
+                st.setString(5, citizen.getDob());
+                st.setString(6, citizen.getAfm());
+                st.setString(7, citizen.getAddress());
+
+                ResultSet rs = st.executeQuery();
+
+                while (rs.next()) {
+                    Citizen c = new Citizen();
+                    c.setId(rs.getString(1));
+                    c.setFirstName(rs.getString(2));
+                    c.setLastName(rs.getString(3));
+                    c.setGender(rs.getString(4));
+                    c.setDob(rs.getString(5));
+                    c.setAfm(rs.getString(6));
+                    c.setAddress(rs.getString(7));
+
+                    citizens.add(c);
+                }
+            } catch (Exception e) {
+                System.out.println("Could not search citizens registry");
+                System.out.println(e.getMessage());
+            } finally {
+                closeConnection(con);
+            }
+        }
+
+        return citizens;
+    }
+
+    public static Set<Citizen> getAllCitizens() {
+        Set<Citizen> citizens = new HashSet<>();
+        Connection con = getConnection(dbName);
+
+        if (con != null) {
+            try {
+                String stmt = getFileContent("sql/find_all_citizen.sql");
+                PreparedStatement st = con.prepareStatement(stmt);
+                ResultSet rs = st.executeQuery();
+
+                while (rs.next()) {
+                    Citizen c = new Citizen();
+                    c.setId(rs.getString(1));
+                    c.setFirstName(rs.getString(2));
+                    c.setLastName(rs.getString(3));
+                    c.setGender(rs.getString(4));
+                    c.setDob(rs.getString(5));
+                    c.setAfm(rs.getString(6));
+                    c.setAddress(rs.getString(7));
+
+                    citizens.add(c);
+                }
+            } catch (Exception e) {
+                System.out.println("Could not fetch citizens registry");
+                System.out.println(e.getMessage());
+            } finally {
+                closeConnection(con);
+            }
+        }
+
+        return citizens;
+
+    }
 }
