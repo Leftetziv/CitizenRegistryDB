@@ -147,20 +147,23 @@ public class Menu {
         try {
             String id = readId(input, "Please enter ID to update record");
 
+            Citizen oldCitizen;
             if (!citizenRegistry.citizenExists(id)) {
                 System.out.println("Citizen with given ID do no exists.");
                 return;
+            } else {
+                oldCitizen = citizenRegistry.getCitizen(id);
             }
 
             Citizen citizen = new Citizen();
 
             citizen.setId(id);
-            citizen.setFirstName(getStringInputRequired(input, "Please enter first name (old value: "));
-            citizen.setLastName(getStringInputRequired(input, "Please enter last name (old value: "));
-            citizen.setGender(readGender(input, "Please enter gender (m/f) (old value: "));
-            citizen.setDob(readDob(input, "Please enter date of birth (DD-MM-YYYY) (old value: "));
-            citizen.setAfm(readAfm(input, "Please enter AFM (old value: "));
-            citizen.setAddress(getStringInput(input, "Please enter address (old value: "));
+            citizen.setFirstName(getStringInputRequired(input, "Please enter first name (old value: " + oldCitizen.getFirstName() + ")"));
+            citizen.setLastName(getStringInputRequired(input, "Please enter last name (old value: " + oldCitizen.getLastName() + ")"));
+            citizen.setGender(readGender(input, "Please enter gender (m/f) (old value: " + oldCitizen.getGender() + ")"));
+            citizen.setDob(readDob(input, "Please enter date of birth (DD-MM-YYYY) (old value: " + oldCitizen.getDob() + ")"));
+            citizen.setAfm(readAfm(input, "Please enter AFM (old value: " + oldCitizen.getAfm() + ")"));
+            citizen.setAddress(getStringInput(input, "Please enter address (old value: " + oldCitizen.getAddress() + ")"));
 
             boolean updated = citizenRegistry.updateCitizen(citizen);
             if (updated) {

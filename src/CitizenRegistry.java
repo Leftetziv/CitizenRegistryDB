@@ -27,6 +27,10 @@ public class CitizenRegistry {
         return DatabaseConnector.updateCitizen(citizen);
     }
 
+    public Citizen getCitizen(String id) {
+        return DatabaseConnector.getCitizen(id);
+    }
+
     public void searchAndPrintCitizens(Citizen citizen) {
        Set<Citizen> citizens = DatabaseConnector.searchCitizen(citizen);
 

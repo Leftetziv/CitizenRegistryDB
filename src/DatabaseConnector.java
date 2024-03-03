@@ -315,7 +315,7 @@ public class DatabaseConnector {
 
         if (con != null) {
             try {
-                String stmt = getFileContent("sql/find_all_citizen.sql");
+                String stmt = getFileContent("sql/find_all_citizens.sql");
                 PreparedStatement st = con.prepareStatement(stmt);
                 ResultSet rs = st.executeQuery();
 
@@ -340,6 +340,36 @@ public class DatabaseConnector {
         }
 
         return citizens;
+    }
 
+    public static Citizen getCitizen(String id) {
+        Citizen citizen = new Citizen();
+        Connection con = getConnection(dbName);
+
+        if (con != null) {
+            try {
+                String stmt = getFileContent("sql/get_citizen.sql");
+                PreparedStatement st = con.prepareStatement(stmt);
+                st.setString(1, id);
+                ResultSet rs = st.executeQuery();
+
+                if (rs.next()) {
+                    citizen.setId(rs.getString(1));
+                    citizen.setFirstName(rs.getString(2));
+                    citizen.setLastName(rs.getString(3));
+                    citizen.setGender(rs.getString(4));
+                    citizen.setDob(rs.getString(5));
+                    citizen.setAfm(rs.getString(6));
+                    citizen.setAddress(rs.getString(7));
+                }
+            } catch (Exception e) {
+                System.out.println("Could not fetch citizens registry");
+                System.out.println(e.getMessage());
+            } finally {
+                closeConnection(con);
+            }
+        }
+
+        return citizen;
     }
 }
