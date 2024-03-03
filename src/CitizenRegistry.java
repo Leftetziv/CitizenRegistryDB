@@ -15,6 +15,10 @@ public class CitizenRegistry {
         return DatabaseConnector.checkIfCitizenExists(id);
     }
 
+    public Citizen getCitizen(String id) {
+        return DatabaseConnector.getCitizen(id);
+    }
+
     public boolean addCitizen(Citizen citizen) {
         return DatabaseConnector.createCitizen(citizen);
     }
@@ -25,10 +29,6 @@ public class CitizenRegistry {
 
     public boolean updateCitizen(Citizen citizen) {
         return DatabaseConnector.updateCitizen(citizen);
-    }
-
-    public Citizen getCitizen(String id) {
-        return DatabaseConnector.getCitizen(id);
     }
 
     public void searchAndPrintCitizens(Citizen citizen) {
