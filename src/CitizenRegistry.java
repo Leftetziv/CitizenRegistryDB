@@ -1,8 +1,3 @@
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.Statement;
-import java.util.HashSet;
-import java.util.Optional;
 import java.util.Set;
 
 public class CitizenRegistry {

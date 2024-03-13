@@ -45,8 +45,8 @@ public class Menu {
     }
 
     private static String readId(Scanner input, String msg) throws InvalidCustomFieldsException {
-        String id = getStringInputRequired(input, msg);
-        if (id.length() != 2 ) {
+        String id = readStringInputRequired(input, msg);
+        if (id.length() != 8 ) {
             throw new InvalidCustomFieldsException("ERROR. ID must have exactly 8 digits");
         }
 
@@ -54,7 +54,7 @@ public class Menu {
     }
 
     private static String readGender(Scanner input, String msg) throws InvalidCustomFieldsException {
-        String gender = getStringInputRequired(input, msg);
+        String gender = readStringInputRequired(input, msg);
 
         if (!gender.equals("m") && !gender.equals("f")) {
             throw new InvalidCustomFieldsException("ERROR. Gender can only be entered as \'m\' or \'f\'");
@@ -64,7 +64,7 @@ public class Menu {
     }
 
     private static String readDob(Scanner input, String msg) throws InvalidCustomFieldsException {
-        String dob = getStringInputRequired(input, msg);
+        String dob = readStringInputRequired(input, msg);
 
         // Define the regex pattern for the date format
         String regex = "^(0[1-9]|[12]\\d|3[01])-(0[1-9]|1[0-2])-(\\d{4})$"; // Matches DD-MM-YYYY format
@@ -84,13 +84,34 @@ public class Menu {
     }
 
     private static String readAfm(Scanner input, String msg) throws InvalidCustomFieldsException {
-        String afm = getStringInput(input, msg);
+        String afm = readStringInput(input, msg);
 
-        if (afm.length() != 1 && afm.length() != 0) {
+        if (afm.length() != 9 && afm.length() != 0) {
             throw new InvalidCustomFieldsException("ERROR. AFM must have exactly 9 digits");
         }
 
         return afm;
+    }
+
+    private static String readPostalCode(Scanner input, String msg) throws InvalidCustomFieldsException {
+        String postalCode = readStringInput(input, msg);
+
+        //empty postal code is allowed
+        if (postalCode.length() == 0) {
+            return postalCode;
+        }
+
+        if (postalCode.length() != 5) {
+            throw new InvalidCustomFieldsException("ERROR. Postal code must have exactly 5 digits");
+        }
+
+        try {
+            Integer i = Integer.parseInt(postalCode);
+        } catch (NumberFormatException nfe) {
+            throw new InvalidCustomFieldsException("ERROR. Postal code must include only numbers");
+        }
+
+        return postalCode;
     }
 
     private static void addCitizen(Scanner input) {
@@ -105,13 +126,15 @@ public class Menu {
             Citizen citizen = new Citizen();
 
             citizen.setId(id);
-            citizen.setFirstName(getStringInputRequired(input, "Please enter first name"));
-            citizen.setLastName(getStringInputRequired(input, "Please enter last name"));
+            citizen.setFirstName(readStringInputRequired(input, "Please enter first name"));
+            citizen.setLastName(readStringInputRequired(input, "Please enter last name"));
             citizen.setGender(readGender(input, "Please enter gender (m/f)"));
             citizen.setDob(readDob(input, "Please enter date of birth (DD-MM-YYYY)"));
             citizen.setAfm(readAfm(input, "Please enter AFM"));
-            citizen.setAddress(getStringInput(input, "Please enter address"));
-            //todo make own class
+
+            citizen.getAddress().setStreet(readStringInput(input, "Please enter address street name"));
+            citizen.getAddress().setNumber(readStringInput(input, "Please enter address street number"));
+            citizen.getAddress().setPostalCode(readPostalCode(input, "Please enter address postal code"));
 
             boolean created = citizenRegistry.addCitizen(citizen);
             if (created) {
@@ -158,12 +181,15 @@ public class Menu {
             Citizen citizen = new Citizen();
 
             citizen.setId(id);
-            citizen.setFirstName(getStringInputRequired(input, "Please enter first name (old value: " + oldCitizen.getFirstName() + ")"));
-            citizen.setLastName(getStringInputRequired(input, "Please enter last name (old value: " + oldCitizen.getLastName() + ")"));
+            citizen.setFirstName(readStringInputRequired(input, "Please enter first name (old value: " + oldCitizen.getFirstName() + ")"));
+            citizen.setLastName(readStringInputRequired(input, "Please enter last name (old value: " + oldCitizen.getLastName() + ")"));
             citizen.setGender(readGender(input, "Please enter gender (m/f) (old value: " + oldCitizen.getGender() + ")"));
             citizen.setDob(readDob(input, "Please enter date of birth (DD-MM-YYYY) (old value: " + oldCitizen.getDob() + ")"));
             citizen.setAfm(readAfm(input, "Please enter AFM (old value: " + oldCitizen.getAfm() + ")"));
-            citizen.setAddress(getStringInput(input, "Please enter address (old value: " + oldCitizen.getAddress() + ")"));
+
+            citizen.getAddress().setStreet(readStringInput(input, "Please enter address street name (old value: " + oldCitizen.getAddress().getStreet() + ")"));
+            citizen.getAddress().setNumber(readStringInput(input, "Please enter address street number (old value: " + oldCitizen.getAddress().getNumber() + ")"));
+            citizen.getAddress().setPostalCode(readPostalCode(input, "Please enter address postal code (old value: "+ oldCitizen.getAddress().getPostalCode() + ")"));
 
             boolean updated = citizenRegistry.updateCitizen(citizen);
             if (updated) {
@@ -180,52 +206,65 @@ public class Menu {
         try {
             Citizen citizen = new Citizen();
 
-            String includeId = getStringInput(input, "Include ID in search? (y/N)");
+            String includeId = readStringInput(input, "Include ID in search? (y/N)");
             if (includeId.equals("y") || includeId.equals("Y")) {
                 citizen.setId(readId(input, "Please enter ID"));
             } else {
                 citizen.setId("%");
             }
 
-            String includeFirstName = getStringInput(input, "Include first name in search? (y/N)");
+            String includeFirstName = readStringInput(input, "Include first name in search? (y/N)");
             if (includeFirstName.equals("y") || includeFirstName.equals("Y")) {
-                citizen.setFirstName(getStringInputRequired(input, "Please enter first name"));
+                citizen.setFirstName(readStringInputRequired(input, "Please enter first name"));
             } else {
                 citizen.setFirstName("%");
             }
 
-            String includeLastName = getStringInput(input, "Include last name in search? (y/N)");
+            String includeLastName = readStringInput(input, "Include last name in search? (y/N)");
             if (includeLastName.equals("y") || includeLastName.equals("Y")) {
-                citizen.setLastName(getStringInputRequired(input, "Please enter last name"));
+                citizen.setLastName(readStringInputRequired(input, "Please enter last name"));
             } else {
                 citizen.setLastName("%");
             }
 
-            String includeGender = getStringInput(input, "Include gender in search? (y/N)");
+            String includeGender = readStringInput(input, "Include gender in search? (y/N)");
             if (includeGender.equals("y") || includeGender.equals("Y")) {
                 citizen.setGender(readGender(input, "Please enter gender (m/f)"));
             } else {
                 citizen.setGender("%");
             }
 
-            String includeDob = getStringInput(input, "Include DOB in search? (y/N)");
+            String includeDob = readStringInput(input, "Include DOB in search? (y/N)");
             if (includeDob.equals("y") || includeDob.equals("Y")) {
                 citizen.setDob(readDob(input, "Please enter date of birth (DD-MM-YYYY)"));
             } else {
                 citizen.setDob("%");
             }
 
-            String includeAfm = getStringInput(input, "Include AFM in search? (y/N)");
+            String includeAfm = readStringInput(input, "Include AFM in search? (y/N)");
             if (includeAfm.equals("y") || includeAfm.equals("Y")) {
                 citizen.setAfm(readAfm(input, "Please enter AFM"));
             } else {
                 citizen.setAfm("%");
             }
-            String includeAddress = getStringInput(input, "Include address in search? (y/N)");
-            if (includeAddress.equals("y") || includeAddress.equals("Y")) {
-                citizen.setAddress(getStringInput(input, "Please enter address"));
+
+            String includeAddressStreet = readStringInput(input, "Include address street in search? (y/N)");
+            if (includeAddressStreet.equals("y") || includeAddressStreet.equals("Y")) {
+                citizen.getAddress().setStreet(readStringInput(input, "Please enter address street name"));
             } else {
-                citizen.setAddress("%");
+                citizen.getAddress().setStreet("%");
+            }
+            String includeAddressNumber = readStringInput(input, "Include address number in search? (y/N)");
+            if (includeAddressNumber.equals("y") || includeAddressNumber.equals("Y")) {
+                citizen.getAddress().setNumber(readStringInput(input, "Please enter address street number"));
+            } else {
+                citizen.getAddress().setNumber("%");
+            }
+            String includeAddressPostalCode = readStringInput(input, "Include address postal code in search? (y/N)");
+            if (includeAddressPostalCode.equals("y") || includeAddressPostalCode.equals("Y")) {
+                citizen.getAddress().setPostalCode(readPostalCode(input, "Please enter address postal code"));
+            } else {
+                citizen.getAddress().setPostalCode("%");
             }
 
             citizenRegistry.searchAndPrintCitizens(citizen);
@@ -238,23 +277,23 @@ public class Menu {
         citizenRegistry.printCitizens();
     }
 
-//    private static int getIntInput(Scanner input, String msg) {
+//    private static Integer getIntInput(Scanner input, String msg) throws InvalidCustomFieldsException {
 //        System.out.println(msg);
 //
 //        int value;
 //
 //        try{
 //            value = input.nextInt();
+//            input.nextLine();
 //        } catch (InputMismatchException e) {
-//            System.out.println("ERROR. Did not provide an integer.");
 //            input.next();
-//            throw e;
+//            throw new InvalidCustomFieldsException("ERROR. Did not provide an integer.");
 //        }
 //
-//        return value;
+//        return Integer.valueOf(value);
 //    }
 
-    private static String getStringInputRequired(Scanner input, String msg) throws InvalidCustomFieldsException {
+    private static String readStringInputRequired(Scanner input, String msg) throws InvalidCustomFieldsException {
         System.out.println(msg);
 
         String value = input.nextLine();
@@ -266,7 +305,7 @@ public class Menu {
         return value;
     }
 
-    private static String getStringInput(Scanner input, String msg) {
+    private static String readStringInput(Scanner input, String msg) {
         System.out.println(msg);
 
         String value = input.nextLine();

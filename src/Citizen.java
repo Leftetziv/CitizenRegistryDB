@@ -8,7 +8,7 @@ public class Citizen {
     private String gender;
     private String dob;
     private String afm;
-    private String address;
+    private Address address = new Address();
 
     public Citizen() {
     }
@@ -61,11 +61,11 @@ public class Citizen {
         this.afm = afm;
     }
 
-    public String getAddress() {
+    public Address getAddress() {
         return address;
     }
 
-    public void setAddress(String address) {
+    public void setAddress(Address address) {
         this.address = address;
     }
 
@@ -90,7 +90,7 @@ public class Citizen {
                 ", Last Name: " + lastName +
                 ", Gender: " + gender +
                 ", DOB: " + dob +
-                (afm.equals("")? "" : ", AFM: " + afm) +
-                (address.equals("")? "" : ", Address: " + address);
+                ", AFM: " + afm +
+                ", Address: {" + address + "}";
     }
 }

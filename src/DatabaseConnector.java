@@ -3,7 +3,6 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.sql.*;
 import java.util.HashSet;
-import java.util.Optional;
 import java.util.Set;
 
 public class DatabaseConnector {
@@ -74,7 +73,7 @@ public class DatabaseConnector {
                     }
                 }
             } catch (Exception e) {
-                System.out.println("Could not recieve metadata from DBMS");
+                System.out.println("Could not receive metadata from DBMS");
                 System.out.println(e.getMessage());
             } finally {
                 closeConnection(con);
@@ -120,6 +119,9 @@ public class DatabaseConnector {
                 Statement st = con.createStatement();
 
                 String stmt = getFileContent("sql/create_table_citizen.sql");
+                st.execute(stmt);
+
+                stmt = getFileContent("sql/create_table_address.sql");
                 st.execute(stmt);
 
                 con.commit();
@@ -181,21 +183,32 @@ public class DatabaseConnector {
                 String stmt = getFileContent("sql/insert_citizen.sql");
                 PreparedStatement st = con.prepareStatement(stmt);
 
-                st.setString(1,citizen.getId());
-                st.setString(2,citizen.getFirstName());
-                st.setString(3,citizen.getLastName());
-                st.setString(4,citizen.getGender());
-                st.setString(5,citizen.getDob());
-                st.setString(6,citizen.getAfm());
-                st.setString(7,citizen.getAddress());
-
+                st.setString(1, citizen.getId());
+                st.setString(2, citizen.getFirstName());
+                st.setString(3, citizen.getLastName());
+                st.setString(4, citizen.getGender());
+                st.setString(5, citizen.getDob());
+                st.setString(6, citizen.getAfm());
                 st.execute();
-                con.commit();
 
+                if (!citizen.getAddress().isAddressEmpty()) {
+                    stmt = getFileContent("sql/insert_address.sql");
+                    st = con.prepareStatement(stmt);
+
+                    st.setString(1, citizen.getId());
+                    st.setString(2, citizen.getAddress().getStreet());
+                    st.setString(3, citizen.getAddress().getNumber());
+                    st.setString(4, citizen.getAddress().getPostalCode());
+                    st.execute();
+                }
+
+                con.commit();
                 created = true;
             } catch (Exception e) {
                 System.out.println("Could not add new citizen to registry");
                 System.out.println(e.getMessage());
+                System.out.println();
+                e.printStackTrace();
                 rollBack(con);
             } finally {
                 closeConnection(con);
@@ -212,14 +225,18 @@ public class DatabaseConnector {
         if (con != null) {
             try {
                 con.setAutoCommit(false);
+
                 String stmt = getFileContent("sql/delete_citizen.sql");
                 PreparedStatement st = con.prepareStatement(stmt);
-
                 st.setString(1, id);
-
                 st.execute();
-                con.commit();
 
+                stmt = getFileContent("sql/delete_address.sql");
+                st = con.prepareStatement(stmt);
+                st.setString(1, id);
+                st.execute();
+
+                con.commit();
                 deleted = true;
             } catch (Exception e) {
                 System.out.println("Could not add new citizen to registry");
@@ -240,20 +257,48 @@ public class DatabaseConnector {
         if (con != null) {
             try {
                 con.setAutoCommit(false);
+
                 String stmt = getFileContent("sql/update_citizen.sql");
                 PreparedStatement st = con.prepareStatement(stmt);
-
-                st.setString(1,citizen.getFirstName());
-                st.setString(2,citizen.getLastName());
-                st.setString(3,citizen.getGender());
-                st.setString(4,citizen.getDob());
-                st.setString(5,citizen.getAfm());
-                st.setString(6,citizen.getAddress());
-                st.setString(7,citizen.getId());
-
+                st.setString(1, citizen.getFirstName());
+                st.setString(2, citizen.getLastName());
+                st.setString(3, citizen.getGender());
+                st.setString(4, citizen.getDob());
+                st.setString(5, citizen.getAfm());
+                st.setString(6, citizen.getId());
                 st.execute();
-                con.commit();
 
+                if (citizen.getAddress().isAddressEmpty()) {
+                    stmt = getFileContent("sql/delete_address.sql");
+                    st = con.prepareStatement(stmt);
+                    st.setString(1, citizen.getId());
+                    st.execute();
+                } else {
+                    stmt = getFileContent("sql/check_if_address_exists.sql");
+                    st = con.prepareStatement(stmt);
+                    st.setString(1,citizen.getId());
+                    ResultSet rs = st.executeQuery();
+
+                    if (rs.next()) {
+                        stmt = getFileContent("sql/update_address.sql");
+                        st = con.prepareStatement(stmt);
+                        st.setString(1, citizen.getAddress().getStreet());
+                        st.setString(2, citizen.getAddress().getNumber());
+                        st.setString(3, citizen.getAddress().getPostalCode());
+                        st.setString(4, citizen.getId());
+                        st.execute();
+                    } else {
+                        stmt = getFileContent("sql/insert_address.sql");
+                        st = con.prepareStatement(stmt);
+                        st.setString(1, citizen.getId());
+                        st.setString(2, citizen.getAddress().getStreet());
+                        st.setString(3, citizen.getAddress().getNumber());
+                        st.setString(4, citizen.getAddress().getPostalCode());
+                        st.execute();
+                    }
+                }
+
+                con.commit();
                 updated = true;
             } catch (Exception e) {
                 System.out.println("Could not update citizen to registry");
@@ -267,7 +312,7 @@ public class DatabaseConnector {
         return updated;
     }
 
-    public static Set<Citizen> searchCitizen(Citizen citizen) {
+    public static Set<Citizen> searchCitizen(Citizen citizen) { //todo check an doulevei
         Set<Citizen> citizens = new HashSet<>();
         Connection con = getConnection(dbName);
 
@@ -282,7 +327,9 @@ public class DatabaseConnector {
                 st.setString(4, citizen.getGender());
                 st.setString(5, citizen.getDob());
                 st.setString(6, citizen.getAfm());
-                st.setString(7, citizen.getAddress());
+                st.setString(7, citizen.getAddress().getStreet());
+                st.setString(8, citizen.getAddress().getNumber());
+                st.setString(9, citizen.getAddress().getPostalCode());
 
                 ResultSet rs = st.executeQuery();
 
@@ -294,7 +341,9 @@ public class DatabaseConnector {
                     c.setGender(rs.getString(4));
                     c.setDob(rs.getString(5));
                     c.setAfm(rs.getString(6));
-                    c.setAddress(rs.getString(7));
+                    c.getAddress().setStreet(rs.getString(7));
+                    c.getAddress().setNumber(rs.getString(8));
+                    c.getAddress().setPostalCode(rs.getString(9));
 
                     citizens.add(c);
                 }
@@ -315,7 +364,7 @@ public class DatabaseConnector {
 
         if (con != null) {
             try {
-                String stmt = getFileContent("sql/find_all_citizens.sql");
+                String stmt = getFileContent("sql/find_all_citizens_and_addresses.sql");
                 PreparedStatement st = con.prepareStatement(stmt);
                 ResultSet rs = st.executeQuery();
 
@@ -327,7 +376,9 @@ public class DatabaseConnector {
                     c.setGender(rs.getString(4));
                     c.setDob(rs.getString(5));
                     c.setAfm(rs.getString(6));
-                    c.setAddress(rs.getString(7));
+                    c.getAddress().setStreet(rs.getString(7));
+                    c.getAddress().setNumber(rs.getString(8));
+                    c.getAddress().setPostalCode(rs.getString(9));
 
                     citizens.add(c);
                 }
@@ -360,7 +411,9 @@ public class DatabaseConnector {
                     citizen.setGender(rs.getString(4));
                     citizen.setDob(rs.getString(5));
                     citizen.setAfm(rs.getString(6));
-                    citizen.setAddress(rs.getString(7));
+                    citizen.getAddress().setStreet(rs.getString(7));
+                    citizen.getAddress().setNumber(rs.getString(8));
+                    citizen.getAddress().setPostalCode(rs.getString(9));
                 }
             } catch (Exception e) {
                 System.out.println("Could not fetch citizens registry");

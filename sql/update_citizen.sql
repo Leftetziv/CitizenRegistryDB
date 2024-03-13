@@ -4,6 +4,5 @@ SET
 	last_name=?,
 	gender=?,
 	dob=?, 
-	afm=?,
-	address=?
+	afm=?
 WHERE id=?;
